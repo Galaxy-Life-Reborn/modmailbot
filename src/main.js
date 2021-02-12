@@ -1,5 +1,6 @@
 const Eris = require("eris");
 const path = require("path");
+const fs = require("fs");
 
 const config = require("./cfg");
 const bot = require("./bot");
@@ -13,6 +14,8 @@ const { callBeforeNewThreadHooks } = require("./hooks/beforeNewThread");
 const blocked = require("./data/blocked");
 const threads = require("./data/threads");
 const updates = require("./data/updates");
+
+const helpConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", config.helpEmbeds)));
 
 const {ACCIDENTAL_THREAD_MESSAGES} = require("./data/constants");
 
@@ -168,17 +171,40 @@ function initBaseMessageHandlers() {
         await thread.receiveUserReply(msg);
 
         if (createNewThread) {
-          // Send auto-reply to the user
-          // if (config.responseMessage) {
-          //   const responseMessage = utils.readMultilineConfigValue(config.responseMessage);
+          // Send auto-reply with options to the user
+          let message = "";
+          Object.entries(helpConfig).forEach(([ key, value ]) => {
+            message += `**${key}:** ${value.description}\n`;
+          })
+          await thread.sendSystemMessageToUser(message);
 
-          //   try {
-          //     const postToThreadChannel = config.showResponseMessageInThreadChannel;
-          //     await thread.sendSystemMessageToUser(responseMessage, { postToThreadChannel });
-          //   } catch (err) {
-          //     await thread.postSystemMessage(`**NOTE:** Could not send auto-response to the user. The error given was: \`${err.message}\``);
-          //   }
-          // }
+        } else {
+          if (! thread.contact_team) {
+            // Check if the option exists
+            if (helpConfig[msg.content]) {
+              // Check if the option should contact the moderator team
+              if (helpConfig[msg.content].contact) {
+                // Contact the moderator team
+                if (config.responseMessage) {
+                  const responseMessage = utils.readMultilineConfigValue(config.responseMessage);
+      
+                  try {
+                    const postToThreadChannel = config.showResponseMessageInThreadChannel;
+                    await thread.sendSystemMessageToUser(responseMessage, { postToThreadChannel });
+                  } catch (err) {
+                    await thread.postSystemMessage(`**NOTE:** Could not send auto-response to the user. The error given was: \`${err.message}\``);
+                  }
+                }
+                await thread.contactTeam();
+              } else {
+                // Send the help-embed
+                await thread.sendSystemEmbedToUser(helpConfig[msg.content].content);
+              }
+            } else {
+              // Notify the user that the option is invalid
+              await thread.sendSystemMessageToUser(config.notAnOption);
+            }
+          }
         }
       }
     });

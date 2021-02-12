@@ -63,6 +63,11 @@ class Thread {
     }, {});
   }
 
+  async contactTeam() {
+    await knex("threads").where("id", this.id).update("contact_team", true);
+    this._postToThreadChannel(`${utils.getInboxMention()} ${this.user_name} needs direct help.`)
+  }
+
   /**
    * @param {Eris.MessageContent} text
    * @param {Eris.MessageFile|Eris.MessageFile[]} file
