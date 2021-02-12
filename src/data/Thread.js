@@ -81,6 +81,26 @@ class Thread {
   }
 
   /**
+   * @param {object} embed
+   * @returns {Promise<Eris.Message>}
+   * @throws Error
+   * @private
+   */
+  async _sendEmbedToUser(embed) {
+    // Try to open a DM channel with the user
+    const dmChannel = await this.getDMChannel();
+    if (! dmChannel) {
+      throw new Error("Could not open DMs with the user. They may have blocked the bot or set their privacy settings higher.");
+    }
+
+    if (! embed.embed) {
+      throw new Error(`${embed.name} is not a valid embed.`);
+    }
+
+    return dmChannel.createMessage(embed);
+  }
+
+  /**
    * @param {Eris.MessageContent} content
    * @param {Eris.MessageFile} file
    * @return {Promise<Eris.Message|null>}
@@ -110,6 +130,29 @@ class Thread {
       }
 
       return firstMessage;
+    } catch (e) {
+      // Channel not found
+      if (e.code === 10003) {
+        console.log(`[INFO] Failed to send message to thread channel for ${this.user_name} because the channel no longer exists. Auto-closing the thread.`);
+        this.close(true);
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * @param {object} embed
+   * @return {Promise<Eris.Message|null>}
+   * @private
+   */
+  async _postEmbedToThreadChannel(embed) {
+    if (! embed.embed) {
+      throw new Error(`${embed.name} is not a valid embed.`);
+    }
+    try {
+      embed.content = `**⚙️ ${bot.user.username}:**`;
+      return bot.createMessage(this.channel_id, embed);
     } catch (e) {
       // Channel not found
       if (e.code === 10003) {
@@ -502,6 +545,32 @@ class Thread {
       const finalInboxContent = typeof inboxContent === "string" ? {content: inboxContent} : inboxContent;
       finalInboxContent.allowedMentions = opts.allowedMentions;
       const inboxMsg = await this._postToThreadChannel(inboxContent);
+      threadMessage.inbox_message_id = inboxMsg.id;
+    }
+
+    threadMessage.dm_channel_id = dmMsg.channel.id;
+    threadMessage.dm_message_id = dmMsg.id;
+
+    await this._addThreadMessageToDB(threadMessage.getSQLProps());
+  }
+
+  /**
+   * @param {object} embed
+   * @returns {Promise<void>}
+   */
+  async sendSystemEmbedToUser(embed) {
+    const threadMessage = new ThreadMessage({
+      message_type: THREAD_MESSAGE_TYPE.SYSTEM_TO_USER,
+      user_id: null,
+      user_name: "",
+      body: embed,
+      is_anonymous: 0,
+    });
+
+    const dmMsg = await this._sendEmbedToUser(embed);
+
+    if (config.postEmbedToThreadChannel) {
+      const inboxMsg = await this._postEmbedToThreadChannel(embed);
       threadMessage.inbox_message_id = inboxMsg.id;
     }
 
