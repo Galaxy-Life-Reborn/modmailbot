@@ -6,12 +6,10 @@ The plugin consists of two separate files:
 ```ini
 # Main file
 plugins[] = ./src/plugins/moderatorStats.js
-# File for SQLite Table creation, can be removed after initial setup
-plugins[] = ./src/plugins/initializeModeratorStatsDB.js
 ```
 
 ## Configure needed values
-You need to give the plugin the ID of a role that should be able to execute the commands. Furthermore, you CAN make the bot use images in the embed messages
+You need to give the plugin the ID of a channel in which the commands can be executed. Furthermore, you CAN make the bot use images in the embed messages
 ```ini
 # required
 statChannelId = {ID of the channel wherein the stats command should be able to be executed}
@@ -24,11 +22,7 @@ statFailedEmbedImageUrl = https://cdn.discordapp.com/attachments/778728888602722
 **Please backup your data.sqlite before using this plugin!**
 
 ### Initial setup
-After initially adding the plugin, run `!initializeStatsDB` in a text channel on the inbox-server (you need the supplied role!). This will create the needed table in the SQLite database. Afterwards, you can delete 
-```ini
-plugins[] =./src/plugins/initializeModeratorStatsDB.js
-```
-from the `config.ini` file, since you won't need to run this command again.
+On the first run after installing this plugin, the bot should run a database migration on startup.
 
 ### Commands
-After these steps, you can use the commands `!stats <userId>` and `!stats total` on the inbox-server. The bot will then DM you the stats of the given moderator or the total stats.
+After these steps, you can use the commands `!stats <userId>` and `!stats total` on the inbox-server. The bot will then send the stats of the given moderator or the total stats in the same channel.
