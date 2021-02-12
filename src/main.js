@@ -172,9 +172,9 @@ function initBaseMessageHandlers() {
 
         if (createNewThread) {
           // Send auto-reply with options to the user
-          let message = "";
+          let message = "__**Before contacting us please check if your issue can be found in the list below**__";
           Object.entries(helpConfig).forEach(([ key, value ]) => {
-            message += `**${key}:** ${value.description}\n`;
+            message += `\n\t- **${key}:**  ${value.description}`;
           })
           await thread.sendSystemMessageToUser(message);
 
