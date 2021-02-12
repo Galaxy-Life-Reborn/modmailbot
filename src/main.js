@@ -162,6 +162,7 @@ function initBaseMessageHandlers() {
         if (config.ignoreAccidentalThreads && msg.content && ACCIDENTAL_THREAD_MESSAGES.includes(msg.content.trim().toLowerCase())) return;
 
         thread = await threads.createNewThreadForUser(msg.author, {
+          quiet: true,
           source: "dm",
           message: msg,
         });
