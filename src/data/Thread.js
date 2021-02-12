@@ -32,6 +32,7 @@ const {THREAD_MESSAGE_TYPE, THREAD_STATUS, DISCORD_MESSAGE_ACTIVITY_TYPES} = req
  * @property {Object} log_storage_data
  * @property {String} created_at
  * @property {String} metadata
+ * @property {boolean} contact_team
  */
 class Thread {
   constructor(props) {
@@ -421,7 +422,7 @@ class Thread {
       });
     }
 
-    if (this.alert_ids) {
+    if (this.alert_ids && this.contact_team) {
       const ids = this.alert_ids.split(",");
       const mentionsStr = ids.map(id => `<@!${id}> `).join("");
 
