@@ -169,16 +169,16 @@ function initBaseMessageHandlers() {
 
         if (createNewThread) {
           // Send auto-reply to the user
-          if (config.responseMessage) {
-            const responseMessage = utils.readMultilineConfigValue(config.responseMessage);
+          // if (config.responseMessage) {
+          //   const responseMessage = utils.readMultilineConfigValue(config.responseMessage);
 
-            try {
-              const postToThreadChannel = config.showResponseMessageInThreadChannel;
-              await thread.sendSystemMessageToUser(responseMessage, { postToThreadChannel });
-            } catch (err) {
-              await thread.postSystemMessage(`**NOTE:** Could not send auto-response to the user. The error given was: \`${err.message}\``);
-            }
-          }
+          //   try {
+          //     const postToThreadChannel = config.showResponseMessageInThreadChannel;
+          //     await thread.sendSystemMessageToUser(responseMessage, { postToThreadChannel });
+          //   } catch (err) {
+          //     await thread.postSystemMessage(`**NOTE:** Could not send auto-response to the user. The error given was: \`${err.message}\``);
+          //   }
+          // }
         }
       }
     });
