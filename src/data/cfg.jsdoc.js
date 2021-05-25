@@ -87,4 +87,5 @@
  * @property {string} mysqlOptions.password
  * @property {string} mysqlOptions.database
  * @property {string} [mysqlOptions.timezone]
+ * @property {array} [ignoreError=[]]
  */

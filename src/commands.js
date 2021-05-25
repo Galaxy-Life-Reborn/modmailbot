@@ -87,7 +87,9 @@ module.exports = {
       const matchedCommand = await manager.findMatchingCommand(msg.content, { msg });
       if (matchedCommand === null) return;
       if (matchedCommand.error !== undefined) {
-        utils.postError(msg.channel, matchedCommand.error);
+        if (! config.ignoreError.some((ignore) => msg.content.startsWith("!" + ignore))) {
+          utils.postError(msg.channel, matchedCommand.error);
+        }
         return;
       }
 

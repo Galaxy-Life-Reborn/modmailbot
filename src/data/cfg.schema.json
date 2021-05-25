@@ -462,6 +462,13 @@
         }
       },
       "required": ["host", "port", "user", "password", "database"]
+    },
+    "ignoreError": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "allOf": [
